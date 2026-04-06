@@ -47,25 +47,25 @@ The system follows a **Domain-Driven Design (DDD)** layered approach, ensuring s
 
 ```mermaid
 graph TD
-    Client(Mobile App / Web Console) -->|REST / JWT| Gateway(Spring Boot Monolith)
+    Client(Mobile App / Web Console) -->|"REST / JWT"| Gateway(Spring Boot Monolith)
     Gateway --> SecurityFilter{JWT Filter}
-    SecurityFilter -->|Authenticated| Controllers
+    SecurityFilter -->|"Authenticated"| Controllers
     
     subgraph "Application Core"
     Controllers(Controllers Layer) --> Services(Service Layer)
     Services --> Repositories(Repository Layer)
-    Services -->|Produce Event| Kafka[Apache Kafka Cluster]
+    Services -->|"Produce Event"| Kafka[Apache Kafka Cluster]
     end
     
-    Repositories <--> DB[(PostgreSQL)]
+    Repositories --- DB[(PostgreSQL)]
     
     subgraph "Asynchronous Workers"
-    Kafka -->|Consume Event| NotificationConsumer(Notification Service)
+    Kafka -->|"Consume Event"| NotificationConsumer(Notification Service)
     NotificationConsumer --> EmailAPI[SMTP Provider]
     NotificationConsumer --> WSBroker[WebSocket STOMP Broker]
     end
     
-    Client <--|Persistent TCP Socket| WSBroker
+    WSBroker -->|"Persistent TCP Socket"| Client
 ```
 
 ---
