@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: inventory-order-system
+
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/inventory_db
+    username: postgres
+    password: Xyz12345.
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create # Rebuild schema to inject new OTP columns
+    show-sql: false
+    open-in-view: false # Recommended for performance
+    properties:
+      hibernate:
+        format_sql: false
+        # Note: dialect is auto-detected by Hibernate 7+
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      timeout: 2000
+
+  cache:
+    type: redis
+
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: inventory-order-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: a4ef27c31246e3
+    password: 31fe1dc3b2954f
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: dGhpcyBpcyBhIHZlcnkgc2VjdXJlIGFuZCBsb25nIHNlY3JldCBrZXkgZm9yIEpXVCBzaWduaW5n
+  expirationMs: 3600000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    com.example.inventory_order_system: INFO
+    org.springframework.security: WARN
+    org.springframework.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [traceId=%X{correlation-id}] - %msg%n"
